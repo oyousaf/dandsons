@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import { business } from '../lib/site';
+---
+
+<Base title="Privacy Notice | Daniel & Son Landscaping" description="How Daniel & Son Landscaping handles the personal information you share when asking for a quote." crumbs={[{ label: 'Privacy', href: '/privacy' }]}>
+  <section class="wrap pt-6 pb-16 md:pb-24">
+    <h1 class="text-section">Privacy notice</h1>
+    <div class="copy mt-8">
+      <p class="text-lg">This notice explains what happens to the information you share with {business.name} through this website.</p>
+      <h2>What we collect</h2>
+      <p>When you ask for a quote we collect your name, email address, phone number, town or postcode, details of your project and any photos you choose to send.</p>
+      <h2>Why we use it</h2>
+      <p>We use your details to respond to your enquiry, prepare a quote and carry out any work you agree to. Our lawful bases are your request for a quote and our legitimate interest in running the business. We do not sell your information or use it for unrelated marketing.</p>
+      <h2>Who can see it</h2>
+      <p>Your enquiry is available to the people at {business.short} who deal with it, and to service providers who host our website and email on our behalf.</p>
+      <h2>How long we keep it</h2>
+      <p>We keep enquiries only for as long as we need them to respond and to keep proper business records.</p>
+      <h2>Cookies and tracking</h2>
+      <p>This website does not use advertising or analytics cookies. The cost estimator works without storing your details.</p>
+      <h2>Your rights</h2>
+      <p>You can ask to see, correct or delete the information we hold about you, or object to how we use it. Email <a href={`mailto:${business.email}`}>{business.email}</a>. You can also complain to the Information Commissioner's Office at ico.org.uk.</p>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,55 @@
+---
+// Schematic of the service area, plotted from approximate town coordinates.
+const centre = { lat: 52.136, lon: -0.466 };
+const milesPerLat = 69;
+const milesPerLon = 42.5;
+const pxPerMile = 13.4;
+const towns: { name: string; lat: number; lon: number; anchor?: 'start' | 'end'; dy?: number }[] = [
+  { name: 'Kempston', lat: 52.115, lon: -0.5, anchor: 'end', dy: 5 },
+  { name: 'Ampthill', lat: 52.026, lon: -0.494, anchor: 'start', dy: 3 },
+  { name: 'Flitwick', lat: 52.004, lon: -0.496, anchor: 'start', dy: 6 },
+  { name: 'Woburn Sands', lat: 52.018, lon: -0.65, anchor: 'end', dy: 5 },
+  { name: 'Cranfield', lat: 52.069, lon: -0.607, anchor: 'end', dy: 5 },
+  { name: 'Biggleswade', lat: 52.087, lon: -0.264, anchor: 'start', dy: 5 },
+  { name: 'Sandy', lat: 52.131, lon: -0.297, anchor: 'start', dy: 5 },
+  { name: 'Sharnbrook', lat: 52.226, lon: -0.549, anchor: 'start', dy: 5 },
+  { name: 'Turvey', lat: 52.163, lon: -0.627, anchor: 'end', dy: 5 },
+];
+const villages = [
+  [52.149, -0.53], [52.113, -0.443], [52.161, -0.491], [52.097, -0.533], [52.063, -0.552], [52.094, -0.449], [52.168, -0.527], [52.212, -0.553],
+] as const;
+const project = (lat: number, lon: number) => ({
+  x: 210 + (lon - centre.lon) * milesPerLon * pxPerMile,
+  y: 210 - (lat - centre.lat) * milesPerLat * pxPerMile,
+});
+const radii = [5, 10, 15];
+---
+
+<svg viewBox="0 0 420 420" role="img" aria-labelledby="area-map-title" class="h-auto w-full">
+  <title id="area-map-title">Map showing a 15-mile radius around Bedford, reaching Sharnbrook, Turvey, Woburn Sands, Flitwick, Biggleswade and Sandy.</title>
+  <circle cx="210" cy="210" r={15 * pxPerMile} class="fill-surface"></circle>
+  {radii.map((r) => <circle cx="210" cy="210" r={r * pxPerMile} fill="none" class="stroke-rule" stroke-width="1.5" stroke-dasharray={r === 15 ? undefined : '3 5'} />)}
+  <text x="210" y={210 - 15 * pxPerMile + 18} text-anchor="middle" font-family="var(--font-mono)" font-size="12" class="fill-muted">15 miles</text>
+  {
+    villages.map(([lat, lon]) => {
+      const p = project(lat, lon);
+      return <circle cx={p.x} cy={p.y} r="2.5" class="fill-muted" />;
+    })
+  }
+  {
+    towns.map((t) => {
+      const p = project(t.lat, t.lon);
+      const anchor = t.anchor ?? 'start';
+      return (
+        <g>
+          <rect x={p.x - 3.5} y={p.y - 3.5} width="7" height="7" class="fill-accent" />
+          <text x={p.x + (anchor === 'start' ? 9 : -9)} y={p.y + (t.dy ?? 4)} text-anchor={anchor} font-size="14.5" font-weight="550" class="fill-ink">
+            {t.name}
+          </text>
+        </g>
+      );
+    })
+  }
+  <rect x="202" y="202" width="16" height="16" class="fill-accent"></rect>
+  <text x="225" y="196" font-family="var(--font-display)" font-size="21" class="fill-accent">Bedford</text>
+</svg>

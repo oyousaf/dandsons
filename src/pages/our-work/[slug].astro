@@ -1,0 +1,120 @@
+---
+import BeforeAfter from '../../components/BeforeAfter.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import ProjectFlag from '../../components/ProjectFlag.astro';
+import Base from '../../layouts/Base.astro';
+import { projects, projectsWith, type Project } from '../../lib/content';
+import { slugify } from '../../lib/site';
+
+export function getStaticPaths() {
+  return projects.map((project) => ({ params: { slug: project.slug }, props: { project } }));
+}
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const index = projects.findIndex((p) => p.slug === project.slug);
+const newer = projects[index - 1];
+const older = projects[index + 1];
+const related = projectsWith(project.materials, 3, project.slug);
+const [lead, ...rest] = project.story;
+---
+
+<Base title={`${project.title} | Daniel & Son Landscaping`} description={project.description || lead.slice(0, 155)} crumbs={[{ label: 'Our work', href: '/our-works' }, { label: project.title, href: `/our-work/${project.slug}` }]}>
+  <article>
+    <header class="wrap pt-6 pb-8">
+      <h1 class="max-w-5xl text-section">{project.title}</h1>
+    </header>
+
+    <div class="wrap grid gap-10 pb-16 lg:grid-cols-12 lg:gap-14">
+      <div class="lg:col-span-8">
+        <BeforeAfter before={project.before} after={project.after} title={project.title} sizes="(min-width: 64rem) 62vw, 100vw" eager />
+        <p class="mt-2 text-sm text-muted">Drag the handle, or use the arrow keys, to compare before and after.</p>
+        <div class="copy mt-8 max-w-3xl">
+          <p class="text-xl leading-normal">{lead}</p>
+          {rest.map((p) => <p>{p}</p>)}
+        </div>
+      </div>
+
+      <aside class="lg:sticky lg:top-26 lg:col-span-4 lg:self-start" aria-label="Project details">
+        <dl class="border-t border-ink">
+          <div class="grid grid-cols-[6rem_1fr] gap-4 border-b border-rule py-3">
+            <dt class="spec pt-1 text-muted">Completed</dt>
+            <dd>{project.date}</dd>
+          </div>
+          {
+            project.place && (
+              <div class="grid grid-cols-[6rem_1fr] gap-4 border-b border-rule py-3">
+                <dt class="spec pt-1 text-muted">Location</dt>
+                <dd>{project.place}</dd>
+              </div>
+            )
+          }
+          {
+            project.materials.length > 0 && (
+              <div class="grid grid-cols-[6rem_1fr] gap-4 border-b border-rule py-3">
+                <dt class="spec pt-1 text-muted">Materials</dt>
+                <dd>
+                  <ul class="grid gap-1">
+                    {project.materials.map((m) => (
+                      <li>
+                        <a href={`/our-works?material=${slugify(m)}`} class="underline decoration-rule underline-offset-4 hover:decoration-accent">
+                          {m}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            )
+          }
+        </dl>
+        <a href="/bedford-garden-quote" class="btn btn-primary mt-6 w-full">Get a quote for something similar</a>
+      </aside>
+    </div>
+  </article>
+
+  <nav aria-label="More projects" class="border-y border-rule bg-surface">
+    <div class="wrap grid sm:grid-cols-2">
+      {
+        older ? (
+          <a href={`/our-work/${older.slug}`} class="group block py-6 sm:border-r sm:border-rule sm:pr-8">
+            <span class="spec text-muted">Previous project</span>
+            <span class="mt-1 block font-semibold group-hover:underline">{older.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        newer && (
+          <a href={`/our-work/${newer.slug}`} class="group block border-t border-rule py-6 sm:border-t-0 sm:pl-8 sm:text-right">
+            <span class="spec text-muted">Next project</span>
+            <span class="mt-1 block font-semibold group-hover:underline">{newer.title}</span>
+          </a>
+        )
+      }
+    </div>
+  </nav>
+
+  {
+    related.length > 0 && (
+      <section class="wrap py-14 md:py-20" aria-labelledby="related-heading">
+        <h2 id="related-heading" class="text-section">
+          Similar projects
+        </h2>
+        <ul class="laid mt-8 md:grid-cols-3">
+          {related.map((p) => (
+            <li>
+              <ProjectFlag project={p} sizes="(min-width: 48rem) 30vw, 100vw" />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <CtaBand heading="Could your garden be next?" />
+</Base>

@@ -1,0 +1,26 @@
+---
+import CtaBand from '../components/CtaBand.astro';
+import Faqs from '../components/Faqs.astro';
+import Estimator from '../components/islands/Estimator';
+import Base from '../layouts/Base.astro';
+
+const faqs = [
+  { q: 'What does the guide price include?', a: 'The per-square-metre rates cover labour, materials and waste disposal for a typical job.' },
+  { q: 'Why might my quote be different?', a: 'Access, levels, drainage, existing surfaces and your choice of material all affect the final price. These are starting rates, so your written quote may be higher.' },
+  { q: 'Do I have to give my details to see the estimate?', a: 'No. The figure appears as soon as you enter your measurements. You only share details if you decide to ask for a quote.' },
+];
+---
+
+<Base title="Garden Cost Estimator | Patio, Decking & Turf Prices in Bedford" description="Estimate the cost of a new patio, deck or lawn in seconds using our guide rates per square metre. No email required." crumbs={[{ label: 'Cost estimator', href: '/garden-cost-calculator' }]}>
+  <section class="wrap pt-6 pb-14 md:pb-20">
+    <div class="max-w-3xl">
+      <h1 class="text-section">What might your garden cost?</h1>
+      <p class="mt-5 text-lg">Enter your measurements for an instant guide price. No email needed.</p>
+    </div>
+    <div class="mt-10">
+      <Estimator client:load />
+    </div>
+  </section>
+  <Faqs faqs={faqs} heading="About this estimate" />
+  <CtaBand heading="Want an exact figure?" text="An estimate is a starting point. Send your details and we'll give you a proper written quote, free of charge." />
+</Base>

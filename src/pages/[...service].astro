@@ -1,0 +1,144 @@
+---
+import Blocks from '../components/Blocks.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Faqs from '../components/Faqs.astro';
+import Photo from '../components/Photo.astro';
+import ProjectFlag from '../components/ProjectFlag.astro';
+import Base from '../layouts/Base.astro';
+import { projectsWith, services, type Service } from '../lib/content';
+import { rateByPath, relatedMaterials, serviceGroups, slugify } from '../lib/site';
+
+export function getStaticPaths() {
+  return Object.values(services).map((service) => ({
+    params: { service: service.path.slice(1) },
+    props: { service },
+  }));
+}
+
+interface Props {
+  service: Service;
+}
+
+const { service } = Astro.props;
+const group = serviceGroups.find((g) => service.path === g.href || service.path.startsWith(`${g.href}/`));
+const isHub = !service.parent && !!group?.children.length;
+const self = group?.children.find((c) => c.href === service.path);
+const siblings = group?.children.filter((c) => c.href !== service.path) ?? [];
+const crumbs = [
+  ...(group ? [{ label: group.label, href: group.href }] : []),
+  ...(self ? [{ label: self.label, href: self.href }] : []),
+];
+const rate = rateByPath[service.path];
+const materials = relatedMaterials[service.path] ?? [];
+const related = projectsWith(materials);
+const heroName = service.hero ?? group?.photo ?? 'flag-lawn.jpg';
+const quoteHref = `/bedford-garden-quote?service=${group?.id ?? ''}`;
+---
+
+<Base title={service.title} description={service.description} crumbs={crumbs}>
+  <section class="wrap grid gap-8 pt-6 pb-12 lg:grid-cols-12 lg:items-center lg:gap-12 lg:pb-16">
+    <div class="lg:col-span-6">
+      <h1 class="text-section">{service.h1}</h1>
+      {service.intro.slice(0, 1).map((p) => <p class="mt-5 max-w-xl text-lg" set:html={p} />)}
+      <div class="mt-7 flex flex-wrap items-center gap-3">
+        <a href={quoteHref} class="btn btn-primary">Get a free quote</a>
+        {rate && <a href={`/garden-cost-calculator`} class="btn btn-ghost">From £{rate} per m²</a>}
+      </div>
+    </div>
+    <div class="lg:col-span-6">
+      <div class="laid">
+        <div class="flag aspect-3/2">
+          <Photo name={heroName} alt={service.heroAlt || service.h1} sizes="(min-width: 64rem) 45vw, 100vw" eager />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    isHub && group && (
+      <section class="wrap pb-14" aria-labelledby="children-heading">
+        <h2 id="children-heading" class="sr-only">
+          {group.label} services
+        </h2>
+        <ul class="laid sm:grid-cols-2 lg:grid-cols-3">
+          {group.children.map((c) => (
+            <li class="flag">
+              <a href={c.href} class="group flex h-full min-h-44 flex-col gap-3 p-5 hover:bg-ground sm:p-6">
+                <span class="font-display text-title group-hover:text-accent">{c.label}</span>
+                <span class="text-muted">{c.blurb}</span>
+                <span class="spec mt-auto pt-2 text-accent">View service</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section class="wrap grid gap-10 pb-14 md:pb-20 lg:grid-cols-12">
+    <div class="copy lg:col-span-8 lg:col-start-1">
+      {service.intro.slice(1).map((p) => <p set:html={p} />)}
+      <Blocks blocks={service.extra} />
+      {
+        service.sections.map((s) => (
+          <Fragment>
+            <h2>{s.heading}</h2>
+            <Blocks blocks={s.blocks} />
+          </Fragment>
+        ))
+      }
+    </div>
+    <aside class="lg:sticky lg:top-26 lg:col-span-4 lg:self-start" aria-label="Quote and related services">
+      <div class="border-5 border-rule bg-surface p-6">
+        <h2 class="text-title">Free, no-obligation quote</h2>
+        {rate && <p class="mt-3">Guide price from <strong class="font-semibold">£{rate} per m²</strong>, including labour, materials and waste.</p>}
+        {!rate && <p class="mt-3">Tell us what you have in mind and send a few photos if you can.</p>}
+        <a href={quoteHref} class="btn btn-primary mt-5 w-full">Start your quote</a>
+        <a href="tel:+447936620911" class="btn btn-ghost mt-2 w-full">Call 07936 620911</a>
+      </div>
+      {
+        siblings.length > 0 && !isHub && (
+          <nav aria-label={`More ${group?.label.toLowerCase()} services`} class="mt-6">
+            <h2 class="spec font-mono! text-muted">Also in {group?.label.toLowerCase()}</h2>
+            <ul class="mt-2 border-t border-rule">
+              {siblings.map((c) => (
+                <li class="border-b border-rule">
+                  <a href={c.href} class="block py-3 font-medium hover:text-accent hover:underline">
+                    {c.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </aside>
+  </section>
+
+  {
+    related.length > 0 && (
+      <section class="border-y border-rule bg-surface" aria-labelledby="related-heading">
+        <div class="wrap py-14 md:py-20">
+          <div class="flex flex-wrap items-end justify-between gap-4">
+            <h2 id="related-heading" class="text-section">
+              Recent work
+            </h2>
+            <a href={materials[0] ? `/our-works?material=${slugify(materials[0])}` : '/our-works'} class="text-link inline-block py-1">
+              See more like this
+            </a>
+          </div>
+          <ul class="laid mt-8 md:grid-cols-3">
+            {related.map((p) => (
+              <li>
+                <ProjectFlag project={p} sizes="(min-width: 48rem) 30vw, 100vw" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <Faqs faqs={service.faqs} />
+  <CtaBand quoteHref={quoteHref} />
+</Base>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dandsons.legxcysol.dev/sitemap-index.xml

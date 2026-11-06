@@ -1,0 +1,32 @@
+---
+import { Picture } from 'astro:assets';
+import { photo } from '../lib/content';
+
+interface Props {
+  name: string;
+  alt: string;
+  sizes: string;
+  widths?: number[];
+  class?: string;
+  eager?: boolean;
+}
+
+const { name, alt, sizes, widths = [320, 480, 640, 800, 960, 1200], class: className, eager = false } = Astro.props;
+const src = photo(name);
+// Never upscale: the source library tops out around 960px wide.
+const usable = widths.filter((w) => w < src.width);
+usable.push(src.width);
+---
+
+<Picture
+  src={src}
+  alt={alt}
+  sizes={sizes}
+  widths={usable}
+  formats={['avif', 'webp']}
+  fallbackFormat="jpg"
+  class={className}
+  loading={eager ? 'eager' : 'lazy'}
+  decoding={eager ? 'sync' : 'async'}
+  fetchpriority={eager ? 'high' : 'auto'}
+/>

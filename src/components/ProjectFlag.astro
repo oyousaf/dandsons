@@ -1,0 +1,25 @@
+---
+import type { Project } from '../lib/content';
+import Photo from './Photo.astro';
+
+interface Props {
+  project: Project;
+  sizes: string;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { project, sizes, headingLevel: Heading = 'h3' } = Astro.props;
+---
+
+<article class="flag group h-full">
+  <a href={`/our-work/${project.slug}`} class="flex h-full flex-col">
+    <div class="aspect-4/3 overflow-hidden">
+      <Photo name={project.after} alt="" sizes={sizes} class="object-[50%_30%]" />
+    </div>
+    <div class="flex grow flex-col gap-2 p-4 sm:p-5">
+      <p class="spec text-muted">{project.materials.slice(0, 2).join(' + ') || 'Garden makeover'}</p>
+      <Heading class="font-sans! text-lg font-semibold leading-snug group-hover:underline group-hover:underline-offset-4">{project.title}</Heading>
+      <p class="mt-auto pt-1 text-sm text-muted">{project.date}{project.place ? `, ${project.place}` : ''}</p>
+    </div>
+  </a>
+</article>

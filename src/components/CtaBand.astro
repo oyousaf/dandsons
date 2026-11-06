@@ -1,0 +1,40 @@
+---
+import { business } from '../lib/site';
+
+interface Props {
+  heading?: string;
+  text?: string;
+  quoteHref?: string;
+}
+
+const {
+  heading = 'Tell us about your garden.',
+  text = 'Send a few details and photos for a free, no-obligation quote, or call and talk it through.',
+  quoteHref = '/bedford-garden-quote',
+} = Astro.props;
+---
+
+<section class="on-band bg-band text-on-band">
+  <div class="wrap grid gap-10 py-16 md:grid-cols-12 md:items-end md:py-24">
+    <div class="md:col-span-7">
+      <h2 class="text-section">{heading}</h2>
+      <p class="mt-5 max-w-xl text-lg text-on-band/90">{text}</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href={quoteHref} class="btn btn-solid">Get a free quote</a>
+        <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="btn btn-outline">Message on WhatsApp</a>
+      </div>
+    </div>
+    <ul class="grid gap-2 md:col-span-5 md:justify-items-end">
+      {
+        business.phones.map((p) => (
+          <li>
+            <a href={`tel:${p.tel}`} class="inline-block py-1 font-display text-title hover:underline">
+              {p.display}
+            </a>
+          </li>
+        ))
+      }
+      <li class="spec text-on-band">{business.hours}</li>
+    </ul>
+  </div>
+</section>

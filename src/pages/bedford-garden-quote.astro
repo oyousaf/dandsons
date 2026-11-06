@@ -1,0 +1,26 @@
+---
+import QuoteForm from '../components/islands/QuoteForm';
+import Base from '../layouts/Base.astro';
+import { business } from '../lib/site';
+---
+
+<Base title="Free Garden Quote in Bedford | Daniel & Son Landscaping" description="Tell us about your patio, decking, fencing, turf or garden project for a free, no-obligation quote from Daniel & Son in Bedford." crumbs={[{ label: 'Free quote', href: '/bedford-garden-quote' }]}>
+  <section class="wrap grid gap-12 pt-6 pb-16 lg:grid-cols-12 md:pb-24">
+    <div class="lg:col-span-4">
+      <h1 class="text-section">Get a free quote.</h1>
+      <p class="mt-5 text-lg">Three short steps. There's no obligation, and photos help us give you a better answer first time.</p>
+      <div class="mt-8 border-t border-ink pt-5">
+        <p class="font-semibold">Rather talk it through?</p>
+        <ul class="mt-2 grid gap-1">
+          {business.phones.map((p) => <li><a href={`tel:${p.tel}`} class="inline-block py-1 font-display text-title hover:text-accent">{p.display}</a></li>)}
+        </ul>
+        <p class="mt-2 spec text-muted">{business.hours}</p>
+      </div>
+    </div>
+    <div class="lg:col-span-8">
+      <div class="border-5 border-rule bg-surface p-5 sm:p-8">
+        <QuoteForm client:load />
+      </div>
+    </div>
+  </section>
+</Base>

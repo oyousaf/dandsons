@@ -1,0 +1,59 @@
+---
+import Blocks from '../../components/Blocks.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Faqs from '../../components/Faqs.astro';
+import Photo from '../../components/Photo.astro';
+import Base from '../../layouts/Base.astro';
+import { posts, type Post } from '../../lib/content';
+
+export function getStaticPaths() {
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const more = posts.filter((p) => p.slug !== post.slug).slice(0, 3);
+---
+
+<Base title={`${post.title} | Daniel & Son`} description={post.description} crumbs={[{ label: 'Guides', href: '/blog-list' }, { label: post.title, href: `/blog/${post.slug}` }]}>
+  <article>
+    <header class="wrap grid gap-8 pt-6 pb-10 lg:grid-cols-12 lg:items-center lg:gap-12">
+      <div class="lg:col-span-7">
+        <p class="spec text-muted">Guide, <time>{post.date}</time></p>
+        <h1 class="mt-4 text-section">{post.title}</h1>
+      </div>
+      <div class="aspect-3/2 overflow-hidden lg:col-span-5">
+        <Photo name={post.hero} alt="" sizes="(min-width: 64rem) 38vw, 100vw" eager class="h-full w-full object-cover" />
+      </div>
+    </header>
+    <div class="wrap pb-14">
+      <div class="copy mx-auto">
+        <Blocks blocks={post.blocks} />
+      </div>
+    </div>
+  </article>
+
+  <Faqs faqs={post.faqs} />
+
+  <section class="border-t border-rule bg-surface" aria-labelledby="more-heading">
+    <div class="wrap py-12">
+      <h2 id="more-heading" class="text-title">More guides</h2>
+      <ul class="mt-5 grid gap-x-8 md:grid-cols-3">
+        {
+          more.map((p) => (
+            <li class="border-t border-rule">
+              <a href={`/blog/${p.slug}`} class="block py-4 font-semibold hover:text-accent hover:underline">
+                {p.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>

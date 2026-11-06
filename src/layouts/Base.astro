@@ -1,0 +1,132 @@
+---
+import '@fontsource-variable/hanken-grotesk/wght.css';
+import '@fontsource/dm-mono/latin-400.css';
+import '../styles/global.css';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { business, PREVIEW } from '../lib/site';
+
+interface Crumb {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  crumbs?: Crumb[];
+  ogImage?: string;
+}
+
+const { title, description, crumbs = [], ogImage = '/og.jpg' } = Astro.props;
+const canonical = new URL(Astro.url.pathname.replace(/\.html$/, ''), Astro.site).href;
+
+const localBusiness = {
+  '@context': 'https://schema.org',
+  '@type': 'LandscapingBusiness',
+  name: business.name,
+  url: Astro.site?.href,
+  image: new URL('/og.jpg', Astro.site).href,
+  telephone: business.phones.map((p) => p.tel),
+  email: business.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: `${business.address.street}, ${business.address.village}`,
+    addressLocality: business.address.town,
+    addressRegion: business.address.region,
+    addressCountry: 'GB',
+  },
+  areaServed: { '@type': 'AdministrativeArea', name: business.address.region },
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    opens: '08:00',
+    closes: '18:00',
+  },
+  sameAs: business.social.map((s) => s.href),
+};
+
+const breadcrumbs = crumbs.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [{ label: 'Home', href: '/' }, ...crumbs].map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: c.label,
+        item: new URL(c.href, Astro.site).href,
+      })),
+    }
+  : null;
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {PREVIEW && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f2ede3" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1a14" />
+    <script is:inline>
+      (function () {
+        try {
+          const theme = localStorage.getItem('theme');
+          if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+        } catch {
+          // Storage can be blocked; fall back to the device theme.
+        }
+      })();
+    </script>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={business.name} />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site).href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(localBusiness)} />
+    {breadcrumbs && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbs)} />}
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/young-serif-latin-400-normal.woff2" />
+    <slot name="head" />
+  </head>
+  <body>
+    <a href="#main" class="sr-only z-50 bg-mint px-4 py-3 text-on-mint focus:not-sr-only focus:fixed focus:top-2 focus:left-2">Skip to main content</a>
+    <Header />
+    <main id="main">
+      {
+        crumbs.length > 0 && (
+          <nav aria-label="Breadcrumb" class="wrap pt-5">
+            <ol class="flex flex-wrap items-center gap-x-2 spec text-muted">
+              <li>
+                <a href="/" class="inline-block py-1 hover:text-ink hover:underline">
+                  Home
+                </a>
+              </li>
+              {crumbs.map((c, i) => (
+                <li class="flex items-center gap-2">
+                  <span aria-hidden="true">/</span>
+                  {i === crumbs.length - 1 ? (
+                    <span aria-current="page">{c.label}</span>
+                  ) : (
+                    <a href={c.href} class="inline-block py-1 hover:text-ink hover:underline">
+                      {c.label}
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,41 @@
+---
+const layers = [
+  { name: 'Paving', note: 'Porcelain, sandstone or limestone, set to clean lines and even joints', h: 'h-14', fill: 'bg-[#d9d4c8]', mark: 'flags' },
+  { name: 'Bedding', note: 'Each slab bedded and set with precision, ready for jointing', h: 'h-9', fill: 'bg-[#a8a498]', mark: '' },
+  { name: 'Sub-base', note: 'Reinforced, compacted MOT Type 1 to carry the load', h: 'h-24', fill: 'bg-[#6a665c]', mark: 'stone' },
+  { name: 'Formation', note: 'Dug to depth, levelled, and given a gradient so water drains away', h: 'h-20', fill: 'bg-[#4a3423]', mark: 'soil' },
+];
+---
+
+<figure aria-label="Cross-section of a patio build-up, from paving down to prepared ground" class="border-5 border-rule bg-surface p-4 sm:p-6">
+  <div class="flex items-center gap-2 pb-3" aria-hidden="true">
+    <span class="spec text-muted">Section through a typical patio</span>
+    <span class="h-px grow bg-rule"></span>
+    <span class="spec text-muted">Not to scale</span>
+  </div>
+  <ol class="grid">
+    {
+      layers.map((l) => (
+        <li class="grid grid-cols-5 items-stretch gap-4 sm:grid-cols-12">
+          <div
+            class:list={['col-span-2 sm:col-span-5', l.h, l.fill, l.mark === 'flags' && 'border-b-2 border-ink/40']}
+            style={
+              l.mark === 'flags'
+                ? 'background-image:repeating-linear-gradient(90deg,transparent 0 calc(33.33% - 3px),#231d16 calc(33.33% - 3px) 33.33%)'
+                : l.mark === 'stone'
+                  ? 'background-image:radial-gradient(circle at 25% 30%,#ffffff24 0 2px,transparent 3px),radial-gradient(circle at 70% 65%,#00000033 0 3px,transparent 4px);background-size:22px 18px'
+                  : l.mark === 'soil'
+                    ? 'background-image:radial-gradient(circle at 40% 40%,#ffffff14 0 1.5px,transparent 2px);background-size:13px 11px'
+                    : undefined
+            }
+            aria-hidden="true"
+          />
+          <div class="col-span-3 flex flex-col justify-center border-b border-rule py-2 sm:col-span-7">
+            <p class="font-semibold leading-tight">{l.name}</p>
+            <p class="text-sm leading-snug text-muted">{l.note}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</figure>

@@ -1,0 +1,311 @@
+---
+import AreaMap from '../components/AreaMap.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import BuildUp from '../components/BuildUp.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Photo from '../components/Photo.astro';
+import Base from '../layouts/Base.astro';
+import { projectBySlug, projects, reviews } from '../lib/content';
+import { business, rates, serviceGroups, slugify } from '../lib/site';
+
+const flags = [
+  { name: 'flag-pergola.jpg', tag: 'Aluminium pergola, composite deck', slug: 'aluminium-pergola', span: 'col-span-4', alt: 'Dark aluminium louvred pergola over a grey composite deck behind a brick house' },
+  { name: 'flag-hardwood.jpg', tag: 'Jatoba hardwood', slug: 'hardwood-garden', span: 'col-span-2', alt: 'Glossy oiled jatoba hardwood decking' },
+  { name: 'flag-circle.jpg', tag: 'Sandstone circle', slug: 'york-stone', span: 'col-span-2', alt: 'Natural stone paving laid in a circle beside artificial grass' },
+  { name: 'flag-redesign.jpg', tag: 'Grey sandstone, new lawn', slug: 'grey-sandstone-paving', span: 'col-span-4', alt: 'Garden with a shaped lawn, grey sandstone patios and raised beds' },
+  { name: 'flag-mint-fossil.jpg', tag: 'Mint Fossil sandstone', slug: 'mint-fossil-sandstone-with', span: 'col-span-3', alt: 'Mint Fossil sandstone patio laid in a random pattern' },
+  { name: 'flag-lawn.jpg', tag: 'Porcelain and fresh turf', slug: 'garden-makeover-with-porcelain', span: 'col-span-3', alt: 'Striped fresh lawn with a light porcelain path leading to the house' },
+];
+
+const comparisons = [
+  { project: projectBySlug('aluminium-pergola'), label: 'Pergola and deck' },
+  { project: projectBySlug('garden-makeover-with-porcelain'), label: 'Lawn and porcelain' },
+  { project: projectBySlug('light-white-porcelain'), label: 'Raised patio' },
+];
+
+const materials = [
+  { name: 'Sandstone', note: 'Mint Fossil, Camel Dust, Kandla Grey, Sunset Buff', photo: 'kandla-grey-sandstone-patio.jpg' },
+  { name: 'Porcelain', note: 'Clean, modern and frost-proof', photo: 'raised-patio.jpg' },
+  { name: 'Composite', note: 'Decking and gates with minimal upkeep', photo: 'bespoke-composite-decking.jpg' },
+  { name: 'Timber & cedar', note: 'Jatoba decking and cedar slat fencing', photo: 'hardwood-decking.jpg' },
+  { name: 'Railway sleepers', note: 'Raised beds, edging and level changes', photo: 'porcelain-composite-decking-venetian-fencing.jpg' },
+  { name: 'Natural lawn', note: 'Prepared, levelled and freshly turfed', photo: 'laid-down-natural-grass.jpg' },
+];
+const countFor = (m: string) => projects.filter((p) => p.materials.includes(m)).length;
+
+const steps = [
+  ['Free quote', 'Tell us what you have in mind. We assess the space, measure up and put it in writing.'],
+  ['Choose materials', 'Stone, timber, style and height, picked to suit your garden and your budget.'],
+  ['Clear and prepare', 'Old surfaces come out, waste goes away responsibly and the ground is levelled.'],
+  ['Build', 'Most patios are finished within 3 to 5 days, depending on size and material.'],
+  ['Final check', 'We inspect the finish, tidy up properly and talk you through any aftercare.'],
+];
+
+const featured = reviews[0];
+const wall = reviews.slice(1, 10);
+---
+
+<Base title="Patios, Decking, Landscaping & Fencing in Bedford | Daniel & Son" description="Family-run landscaping across Bedford and Bedfordshire. Patios, decking, fencing, turf and garden care, with free, no-obligation quotes.">
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="bg-lead text-on-lead">
+    <div class="wrap grid items-center gap-10 pt-8 pb-12 lg:grid-cols-12 lg:gap-8 lg:pt-12 lg:pb-16">
+      <div class="lg:col-span-5">
+        <p class="spec">Landscaping in Bedford and Bedfordshire</p>
+        <h1 class="mt-5 text-hero">Landscapes artfully composed, gardens faithfully tended.</h1>
+        <p class="mt-6 max-w-lg text-lg">
+          A family-run team creating patios, decking, fencing and lawns, and maintaining gardens, within {business.radiusMiles} miles of Bedford. Every commission receives the care we would give our own home.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/bedford-garden-quote" class="btn btn-primary">Get a free quote</a>
+          <a href="/our-works" class="btn btn-ghost">See our work</a>
+        </div>
+        <p class="mt-7 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span aria-hidden="true">★★★★★</span>
+          <span><strong class="font-semibold">{business.rating.value}</strong> from {business.rating.count} Google reviews</span>
+        </p>
+      </div>
+
+      <div class="lg:col-span-7 lg:-mr-8 xl:-mr-14">
+        <div class="laid settling grid-cols-6 lg:border-r-0">
+          {
+            flags.map((f, i) => (
+              <a
+                href={`/our-work/${projectBySlug(f.slug).slug}`}
+                class:list={['flag block h-30 sm:h-44 md:h-52 xl:h-62', f.span]}
+                style={`--i:${i}`}
+              >
+                <Photo name={f.name} alt={f.alt} sizes="(min-width: 64rem) 40vw, 67vw" eager={i < 2} />
+                <span class="flag-tag spec hidden sm:block">{f.tag}</span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    </div>
+    <div class="border-y border-rule bg-surface">
+      <ul class="wrap grid grid-cols-2 gap-x-6 gap-y-3 py-5 spec text-ink md:grid-cols-4">
+        <li>Fully insured</li>
+        <li>Registered waste carriers</li>
+        <li>Free, no-obligation quotes</li>
+        <li>Mon to Sat, 8am to 6pm</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Services board -->
+  <section class="wrap py-16 md:py-24" aria-labelledby="services-heading">
+    <div class="grid gap-4 md:grid-cols-12 md:items-end">
+      <h2 id="services-heading" class="text-section md:col-span-7">What we build</h2>
+      <p class="max-w-md text-lg md:col-span-5 md:justify-self-end">One team for the whole garden, from the groundwork to the finishing edge.</p>
+    </div>
+    <div class="laid reveal mt-10 md:grid-cols-6">
+      {
+        serviceGroups.map((g, i) => (
+          <article class:list={['flag flex flex-col', i === 0 ? 'md:col-span-4' : 'md:col-span-2', i === 1 ? '' : '']}>
+            <a href={g.href} class="block aspect-16/10 overflow-hidden md:aspect-auto md:h-64" tabindex="-1" aria-hidden="true">
+              <Photo name={g.photo} alt="" sizes={i === 0 ? '(min-width: 48rem) 60vw, 100vw' : '(min-width: 48rem) 30vw, 100vw'} class="object-[50%_40%]" />
+            </a>
+            <div class="flex grow flex-col gap-3 p-5 sm:p-6">
+              <h3 class="font-display text-title font-normal">
+                <a href={g.href} class="hover:text-accent">{g.label}</a>
+              </h3>
+              <p class="text-[1rem] text-muted">{g.line}</p>
+              {g.children.length > 0 && (
+                <ul class="mt-auto flex flex-wrap gap-x-4 gap-y-1 pt-2 text-[0.9375rem]">
+                  {g.children.map((c) => (
+                    <li>
+                      <a href={c.href} class="inline-block py-1 underline decoration-rule underline-offset-4 hover:decoration-accent">
+                        {c.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Before and after -->
+  <section class="on-deep bg-deep text-on-deep" aria-labelledby="ba-heading">
+    <div class="wrap grid gap-10 py-16 md:py-24 lg:grid-cols-12 lg:items-center">
+      <div class="lg:col-span-4">
+        <p class="spec text-mint">Same garden, same camera angle</p>
+        <h2 id="ba-heading" class="mt-4 text-section">Move the line. See what changed.</h2>
+        <p class="mt-5 text-lg text-on-deep/90">These are real jobs, photographed before we started and after we left.</p>
+        <div class="mt-7 grid gap-2" role="group" aria-label="Choose a project to compare" data-tabs>
+          {
+            comparisons.map((c, i) => (
+              <button
+                type="button"
+                data-tab={i}
+                aria-pressed={i === 0 ? 'true' : 'false'}
+                class="flex min-h-12 items-center justify-between gap-4 border border-on-deep/35 px-4 py-2 text-left font-medium hover:bg-on-deep/10 aria-pressed:border-mint aria-pressed:bg-mint aria-pressed:text-on-mint"
+              >
+                {c.label}
+                <span class="spec">{c.project.date}</span>
+              </button>
+            ))
+          }
+        </div>
+      </div>
+      <div class="lg:col-span-8">
+        {
+          comparisons.map((c, i) => (
+            <div data-panel={i} hidden={i !== 0}>
+              <BeforeAfter before={c.project.before} after={c.project.after} title={c.project.title} />
+              <p class="mt-3 flex flex-wrap justify-between gap-x-6 gap-y-1">
+                <span>{c.project.title}</span>
+                <a href={`/our-work/${c.project.slug}`} class="underline underline-offset-4 hover:text-mint">
+                  Read about this project
+                </a>
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Browse by material -->
+  <section class="wrap py-16 md:py-24" aria-labelledby="materials-heading">
+    <div class="grid gap-10 lg:grid-cols-12">
+      <div class="lg:col-span-4">
+        <h2 id="materials-heading" class="text-section">Start with the material.</h2>
+        <p class="mt-5 max-w-sm text-lg">Most gardens begin with a choice of stone, timber or grass. See how each one looks once it's down.</p>
+        <a href="/our-works" class="text-link mt-6 inline-block py-1">All {projects.length} projects</a>
+      </div>
+      <ul class="border-t border-ink lg:col-span-8">
+        {
+          materials.map((m) => (
+            <li class="border-b border-rule">
+              <a href={`/our-works?material=${slugify(m.name)}`} class="group grid min-h-24 grid-cols-[4.5rem_1fr_auto] items-center gap-4 py-3 sm:grid-cols-[6rem_1fr_auto] sm:gap-6">
+                <div class="aspect-square overflow-hidden">
+                  <Photo name={m.photo} alt="" sizes="6rem" widths={[96, 192]} class="h-full w-full object-cover object-[50%_35%] motion-safe:transition-transform motion-safe:duration-500 group-hover:scale-110" />
+                </div>
+                <div>
+                  <h3 class="font-display text-title font-normal group-hover:text-accent">{m.name}</h3>
+                  <p class="text-[0.9375rem] leading-snug text-muted">{m.note}</p>
+                </div>
+                <p class="spec text-right text-muted">
+                  {countFor(m.name)} <span class="hidden sm:inline">projects</span>
+                  <span class="sr-only sm:hidden">projects</span>
+                </p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Build-up -->
+  <section class="border-y border-rule bg-surface" aria-labelledby="buildup-heading">
+    <div class="wrap grid gap-10 py-16 md:py-24 lg:grid-cols-12 lg:gap-14">
+      <div class="lg:col-span-6">
+        <h2 id="buildup-heading" class="text-section">The part you never see is the part that lasts.</h2>
+        <p class="mt-5 max-w-xl text-lg">Attention to detail runs from sub-base to finishing edges. Good groundwork, drainage and levels are what keep a patio flat and solid for years.</p>
+        <div class="mt-8">
+          <BuildUp />
+        </div>
+      </div>
+      <div class="lg:col-span-6 lg:pt-3">
+        <h3 class="spec text-muted">How a job runs</h3>
+        <ol class="mt-4 border-t border-ink">
+          {
+            steps.map(([title, text], i) => (
+              <li class="grid grid-cols-[3rem_1fr] border-b border-rule py-5">
+                <span class="pt-1 font-mono text-sm text-accent">0{i + 1}</span>
+                <div>
+                  <h4 class="text-xl font-semibold">{title}</h4>
+                  <p class="mt-1 text-muted">{text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews -->
+  <section class="wrap py-16 md:py-24" aria-labelledby="reviews-heading">
+    <div class="grid gap-8 lg:grid-cols-12 lg:items-end">
+      <div class="lg:col-span-8">
+        <p class="spec text-muted" id="reviews-heading">{business.rating.value} stars from {business.rating.count} Google reviews</p>
+        <blockquote class="mt-5 font-display text-section">"Their attention to detail is fantastic, they matched the lines of the current patio so it looks perfect."</blockquote>
+        <p class="mt-4 font-semibold">{featured.name}, new patio</p>
+      </div>
+      <p class="lg:col-span-4 lg:justify-self-end">
+        <a href={business.rating.url} target="_blank" rel="noopener noreferrer" class="text-link inline-block py-1">Review us on Google</a>
+      </p>
+    </div>
+    <div class="mt-12 gap-5 md:columns-2 xl:columns-3">
+      {
+        wall.map((r, i) => (
+          <figure class:list={['mb-5 break-inside-avoid border border-rule bg-surface p-5 sm:p-6', i > 3 && 'hidden md:block']}>
+            <blockquote>"{r.text}"</blockquote>
+            <figcaption class="mt-4 flex items-center justify-between gap-4">
+              <span class="font-semibold">{r.name}</span>
+              <span class="spec text-muted">Google review</span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Area and cost -->
+  <section class="wrap pb-16 md:pb-24">
+    <div class="laid md:grid-cols-2">
+      <div class="flag p-6 sm:p-8">
+        <h2 class="text-title">Within {business.radiusMiles} miles of Bedford</h2>
+        <p class="mt-3 text-muted">Kempston, Ampthill, Flitwick, Woburn Sands, Cranfield, Biggleswade, Sandy and the villages between.</p>
+        <div class="mx-auto mt-4 max-w-md">
+          <AreaMap />
+        </div>
+        <a href="/areas-covered-bedford" class="text-link inline-block py-1">Check your area</a>
+      </div>
+      <div class="flag flex flex-col p-6 sm:p-8">
+        <h2 class="text-title">What might it cost?</h2>
+        <p class="mt-3 text-muted">Guide starting rates per square metre, covering labour, materials and waste disposal.</p>
+        <dl class="mt-6 border-t border-ink">
+          {
+            rates.map((r) => (
+              <div class="flex items-baseline justify-between gap-4 border-b border-rule py-3.5">
+                <dt>{r.label}</dt>
+                <dd class="shrink-0 font-display text-2xl">
+                  £{r.rate}
+                  <span class="font-sans text-sm text-muted"> /m²</span>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <p class="mt-4 text-sm text-muted">From prices. Every garden differs, so your written quote is what counts.</p>
+        <a href="/garden-cost-calculator" class="btn btn-primary mt-auto self-start">Estimate your garden</a>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>
+
+<script>
+  const group = document.querySelector('[data-tabs]');
+  const buttons = group ? [...group.querySelectorAll<HTMLButtonElement>('[data-tab]')] : [];
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-panel]')];
+  buttons.forEach((button) => {
+    button.addEventListener('click', () => {
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+      panels.forEach((p) => {
+        p.hidden = p.dataset.panel !== button.dataset.tab;
+      });
+    });
+  });
+</script>

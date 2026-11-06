@@ -1,0 +1,68 @@
+---
+import type { Block } from '../lib/content';
+
+interface Props {
+  blocks: Block[];
+}
+
+const { blocks } = Astro.props;
+// Each scrollable table region needs its own name, so borrow the nearest heading.
+const tableLabel = (index: number) => {
+  for (let i = index - 1; i >= 0; i--) {
+    const prev = blocks[i];
+    if (/^h[2-5]$/.test(prev.t) && 'x' in prev) return prev.x;
+  }
+  return `Comparison table ${index + 1}`;
+};
+---
+
+{
+  blocks.map((b, index) => {
+    if (b.t === 'p') return <p set:html={b.x} />;
+    if (b.t === 'h2') return <h2>{b.x}</h2>;
+    if (b.t === 'h3') return <h3>{b.x}</h3>;
+    if (b.t === 'h4' || b.t === 'h5') return <h4>{b.x}</h4>;
+    if (b.t === 'ul')
+      return (
+        <ul>
+          {b.items.map((i) => (
+            <li set:html={i} />
+          ))}
+        </ul>
+      );
+    if (b.t === 'ol')
+      return (
+        <ol>
+          {b.items.map((i) => (
+            <li set:html={i} />
+          ))}
+        </ol>
+      );
+    if (b.t === 'table')
+      return (
+        <div class="table-scroll" tabindex="0" role="region" aria-label={tableLabel(index)}>
+          <table>
+            {b.head.length > 0 && (
+              <thead>
+                <tr>
+                  {b.head.map((h) => (
+                    <th scope="col">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+            )}
+            <tbody>
+              {b.rows.map((r) => (
+                <tr>
+                  {r.map((c) => (
+                    <td>{c}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    return null;
+  })
+}

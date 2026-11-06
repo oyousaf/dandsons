@@ -1,0 +1,38 @@
+---
+import Photo from './Photo.astro';
+
+interface Props {
+  before: string;
+  after: string;
+  title: string;
+  sizes?: string;
+  eager?: boolean;
+}
+
+const { before, after, title, sizes = '(min-width: 64rem) 60vw, 100vw', eager = false } = Astro.props;
+---
+
+<figure class="ba" data-ba>
+  <div class="ba-layer">
+    <Photo name={after} alt={`${title}, finished`} sizes={sizes} eager={eager} />
+  </div>
+  <div class="ba-layer ba-before">
+    <Photo name={before} alt={`${title}, before work started`} sizes={sizes} />
+  </div>
+  <span class="ba-label left-0 spec">Before</span>
+  <span class="ba-label right-0 spec">After</span>
+  <span class="ba-line"></span>
+  <span class="ba-grip" aria-hidden="true">
+    <svg width="26" height="14" viewBox="0 0 26 14" fill="none"><path d="M7 1L1 7l6 6M19 1l6 6-6 6" stroke="currentColor" stroke-width="2"></path></svg>
+  </span>
+  <input type="range" min="0" max="100" value="50" aria-label={`Compare before and after: ${title}. Lower values show more of the finished garden.`} />
+</figure>
+
+<script>
+  document.addEventListener('input', (event) => {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || input.type !== 'range') return;
+    const root = input.closest<HTMLElement>('[data-ba]');
+    root?.style.setProperty('--pos', `${input.value}%`);
+  });
+</script>

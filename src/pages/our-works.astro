@@ -1,0 +1,120 @@
+---
+import CtaBand from '../components/CtaBand.astro';
+import ProjectFlag from '../components/ProjectFlag.astro';
+import Base from '../layouts/Base.astro';
+import { projects } from '../lib/content';
+import { slugify } from '../lib/site';
+
+const filterNames = ['Sandstone', 'Porcelain', 'Composite', 'Timber & cedar', 'Railway sleepers', 'Natural lawn', 'Artificial grass', 'Fencing & gates', 'Raised beds', 'Pergolas'];
+const filters = filterNames.map((name) => ({
+  name,
+  slug: slugify(name),
+  count: projects.filter((p) => p.materials.includes(name)).length,
+}));
+const spanFor = (i: number) => (i % 5 < 2 ? 'md:col-span-3' : 'md:col-span-2');
+---
+
+<Base title="Our Work | Patio, Decking & Garden Projects in Bedford" description="Browse real patio, decking, fencing and garden projects across Bedford and Bedfordshire, with before and after photos for each one." crumbs={[{ label: 'Our work', href: '/our-works' }]}>
+  <section class="wrap pt-6 pb-10">
+    <div class="grid gap-5 lg:grid-cols-12 lg:items-end">
+      <h1 class="text-section lg:col-span-8">Finished gardens, with the before photos to prove it.</h1>
+      <p class="text-lg lg:col-span-4">
+        {projects.length} projects from residential gardens to a local church. Open any of them to compare before and after.
+      </p>
+    </div>
+
+    <div class="mt-10" role="group" aria-label="Filter projects by material">
+      <ul class="flex flex-wrap gap-2">
+        <li>
+          <button type="button" data-filter="all" aria-pressed="true" class="filter">All <span class="spec opacity-80">{projects.length}</span></button>
+        </li>
+        {
+          filters.map((f) => (
+            <li>
+              <button type="button" data-filter={f.slug} aria-pressed="false" class="filter">
+                {f.name} <span class="spec opacity-80">{f.count}</span>
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <p role="status" id="filter-status" class="mt-4 spec text-muted">Showing all {projects.length} projects</p>
+  </section>
+
+  <section class="wrap pb-16 md:pb-24" aria-label="Projects">
+    <ul id="project-grid" class="laid grid-cols-1 md:grid-cols-6">
+      {
+        projects.map((p, i) => (
+          <li data-materials={p.materials.map(slugify).join(' ')} class={spanFor(i)}>
+            <ProjectFlag project={p} sizes={i % 5 < 2 ? '(min-width: 48rem) 48vw, 100vw' : '(min-width: 48rem) 32vw, 100vw'} headingLevel="h2" />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <CtaBand heading="Seen something you like?" text="Tell us which project caught your eye and we'll quote for something similar in your garden." />
+</Base>
+
+<style>
+  .filter {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.875rem;
+    border: 1.5px solid var(--color-rule);
+    background: var(--color-surface);
+    font-weight: 550;
+  }
+
+  .filter:hover {
+    border-color: var(--color-ink);
+  }
+
+  .filter[aria-pressed='true'] {
+    border-color: var(--color-on-mint);
+    background: var(--color-mint);
+    color: var(--color-on-mint);
+  }
+</style>
+
+<script>
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+  const items = [...document.querySelectorAll<HTMLLIElement>('#project-grid > li')];
+  const status = document.getElementById('filter-status');
+
+  const apply = (slug: string, push: boolean) => {
+    const update = () => {
+      let shown = 0;
+      items.forEach((item) => {
+        const match = slug === 'all' || (item.dataset.materials ?? '').split(' ').includes(slug);
+        item.hidden = !match;
+        if (match) {
+          // Keep the running-bond rhythm whichever projects remain.
+          item.classList.toggle('md:col-span-3', shown % 5 < 2);
+          item.classList.toggle('md:col-span-2', shown % 5 >= 2);
+          shown += 1;
+        }
+      });
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === slug)));
+      const active = buttons.find((b) => b.dataset.filter === slug);
+      const name = active?.childNodes[0]?.textContent?.trim();
+      if (status) status.textContent = slug === 'all' ? `Showing all ${shown} projects` : `Showing ${shown} ${name} projects`;
+    };
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (document.startViewTransition && !reduced) document.startViewTransition(update);
+    else update();
+    if (push) {
+      const url = new URL(window.location.href);
+      if (slug === 'all') url.searchParams.delete('material');
+      else url.searchParams.set('material', slug);
+      history.replaceState(null, '', url);
+    }
+  };
+
+  buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter ?? 'all', true)));
+  const initial = new URLSearchParams(window.location.search).get('material');
+  if (initial && buttons.some((b) => b.dataset.filter === initial)) apply(initial, false);
+</script>
